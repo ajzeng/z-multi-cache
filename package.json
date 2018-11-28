@@ -1,0 +1,41 @@
+{
+    "name": "z-multi-cache",
+    "version": "0.0.1",
+    "description": "this is a caching tool that uses localStorage, sessionStorage, url in combination to provide more convenient get data from the cache",
+    "main": "lib/index.js",
+    "scripts": {
+        "build": "webpack --config webpack.config.js",
+        "prod": "webpack --config webpack.config.js --buildType=prod",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/ajzeng/z-multi-cache.git"
+    },
+    "keywords": [
+        "cache",
+        "localStorage",
+        "sessionStorage",
+        "memoryStorage",
+        "url",
+        "storage"
+    ],
+    "author": "anjun.zeng",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/ajzeng/z-multi-cache/issues"
+    },
+    "homepage": "https://github.com/ajzeng/z-multi-cache#readme",
+    "devDependencies": {
+        "@babel/core": "^7.1.6",
+        "@babel/plugin-proposal-class-properties": "^7.1.0",
+        "@babel/preset-env": "^7.1.6",
+        "@babel/preset-stage-0": "^7.0.0",
+        "babel-loader": "^8.0.4",
+        "babel-preset-es2015": "^6.24.1",
+        "clean-webpack-plugin": "^1.0.0",
+        "uglifyjs-webpack-plugin": "^2.0.1",
+        "webpack": "^4.25.1",
+        "webpack-cli": "^3.1.2"
+    }
+}
