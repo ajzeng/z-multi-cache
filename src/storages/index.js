@@ -13,11 +13,13 @@ export const storagesMap = storagesList.reduce((map, item) => {
     return map;
 }, {});
 
+/**
+ * check if the type is exist.
+ *
+ * @param {*} type
+ */
 function checkStorageType(type) {
-    const isTypeExist = storagesList.some((item) => {
-       return type === item;
-    });
-    if(!isTypeExist) {
+    if(!storagesMap[type]) {
         throw new Error(`type should be one of: ${storagesListStr}, your value is: ${type}`);
     }
 }
