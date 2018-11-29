@@ -1,5 +1,9 @@
-let globalMemoryStorage;
-
+/**
+ * realize a memoryStorage with the same api as localStorage or sessionStorage.
+ *
+ * @export
+ * @class MemoryStorage
+ */
 export class MemoryStorage {
     storage = {};
 
@@ -20,13 +24,6 @@ export class MemoryStorage {
     }
 }
 
-function getMemoryStorage() {
-    if (globalMemoryStorage) {
-        return globalMemoryStorage;
-    } else {
-        return globalMemoryStorage = new MemoryStorage();
-    }
-}
+const memoryStorage = new MemoryStorage();
 
-const memoryStorage = getMemoryStorage();
 export default memoryStorage;
