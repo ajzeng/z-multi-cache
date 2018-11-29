@@ -7,10 +7,20 @@ const originStorageMap = {
 };
 
 export const storagesList = Object.keys(originStorageMap);
+const storagesListStr = storagesList.join(', ');
 export const storagesMap = storagesList.reduce((map, item) => {
     map[item] = item;
     return map;
 }, {});
+
+function checkStorageType(type) {
+    const isTypeExist = storagesList.some((item) => {
+       return type === item;
+    });
+    if(!isTypeExist) {
+        throw new Error(`type should be one of: ${storagesListStr}, your value is: ${type}`);
+    }
+}
 
 /**
  * get the value from storage(such as localStorage) according to the fields: type, storeKey
@@ -20,6 +30,7 @@ export const storagesMap = storagesList.reduce((map, item) => {
  * @returns store item value
  */
 function getStoreByStoreKey(type, storeKey) {
+    checkStorageType(type);
     const val = originStorageMap[type].getItem(storeKey);
     return JSON.parse(val) || {};
 }
@@ -33,6 +44,7 @@ function getStoreByStoreKey(type, storeKey) {
  * @param {*} errCallBack error callback
  */
 function setStoreByStoreKey(type, storeKey, storeVal, errCallBack) {
+    checkStorageType(type);
     try {
         const valStr = JSON.stringify(storeVal);
         originStorageMap[type].setItem(storeKey, valStr);
