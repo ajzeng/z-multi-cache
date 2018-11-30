@@ -4,7 +4,13 @@ const store = factory({strict: true, template: {
     globalKeys: ['age'],
     pages: ['home']
 }});
-store.set({ key: 'name', value:'tom', scope: 'home/hotel'})
-store.set({ key: 'age', value: 18, scope: 'global'});
-const val = store.get({key: 'name', scope: 'home/hotel'});
+
+
+store.setItem('name', 100, {scope: 'home'})
+store.setItem('age', 18, {scope: 'global', type: store.types.localStorage});
+const val = store.getItem('name', {scope: 'home/hotel', default: '100'});
 console.log('val:', val);
+
+const store
+export const store;
+

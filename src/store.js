@@ -63,17 +63,25 @@ function isGlobalStore(page) {
     return page === 'global';
 }
 
+/**
+ * parse page and itemKey from scope and key.
+ *
+ * @param {*} scope
+ * @param {*} key
+ * @param {*} separator
+ * @returns
+ */
 function getPageAndItemKey(scope, key, separator) {
     if (typeof scope !== 'string') {
         throw new Error('scope need to be a string.');
     }
     // scope = scope.replace(/^(\s*)\/?(\s*)|(\s*)\/?(\s*)$/g, '');
-    scope = scope.replace(/(\s*)\/?(\s*)$/, '');
+    scope = scope.replace(/\s*\/?\s*$/g, '');
     const idx = scope.indexOf(separator);
     const hasSeparator = idx !== -1;
     const page = scope.slice(0, hasSeparator ? idx : void 0).trim();
-    let keyPrefix = scope.substr(hasSeparator ? idx + 1 : scope.length).trim();
-    keyPrefix = keyPrefix.length ? `${keyPrefix}=>` : `${keyPrefix}`;
+    let keyPrefix = scope.substr(hasSeparator ? idx + separator.length : scope.length).trim();
+    keyPrefix = keyPrefix.length ? `${keyPrefix}>` : `${keyPrefix}`;
     const itemKey = isGlobalStore(page) ? `${key}` : `${keyPrefix}${key}`;
     return {
         page: page || void 0, // 如果page为''则返回void 0，是为了方便后面处理默认值
@@ -116,8 +124,8 @@ export function factory(config = {}) {
          *  value: 'beijing' // store value
          * }]
          */
-        set(opts = {}) {
-            const { type = DEFAULT_STORAGE_TYPE, scope = '', key = '', value, errCallBack = noop } = opts;
+        setItem(key = '', value, opts = {}) {
+            const { type = DEFAULT_STORAGE_TYPE, scope = '', errCallBack = noop } = opts;
             checkParams({type});
             const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
             strictCheck(strict, template, page, itemKey);
@@ -134,13 +142,48 @@ export function factory(config = {}) {
          * }]
          * @returns
          */
-        get(opts = {}) {
-            const { type = DEFAULT_STORAGE_TYPE, scope = '', key } = opts;
+        getItem(key = '', opts = {}) {
+            const { type = DEFAULT_STORAGE_TYPE, scope = '', defaultValue } = opts;
             checkParams({type});
             const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
             strictCheck(strict, template, page, itemKey);
             const storeKey = `${partialStoreKey}-${page}`;
-            return storage.getItem(type, storeKey, itemKey);
+            const value =  storage.getItem(type, storeKey, itemKey);
+            if (typeof defaultValue === 'function') {
+                defaultValue = defaultValue();
+            }
+            const returnValue = (value === void 0 || value === null) ? defaultValue : value;
+            return returnValue;
+        },
+
+        /**
+         * remove item from storage.
+         *
+         * @param {*} key
+         * @param {*} [opts={}]
+         */
+        removeItem(key, opts = {}) {
+            const { type = DEFAULT_STORAGE_TYPE, scope = '' } = opts;
+            checkParams({type});
+            const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
+            strictCheck(strict, template, page, itemKey);
+            const storeKey = `${partialStoreKey}-${page}`;
+            store.removeItem(type, storeKey, itemKey);
+        },
+
+        /**
+         * clear one page data from storage.
+         *
+         * @param {*} [opts={}]
+         */
+        clear(opts = {}) {
+            const key = '';
+            const { type = DEFAULT_STORAGE_TYPE, scope = '' } = opts;
+            checkParams({type});
+            const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
+            strictCheck(strict, template, page, itemKey);
+            const storeKey = `${partialStoreKey}-${page}`;
+            store.clear(type, storeKey);
         },
         types: storagesMap
     };
