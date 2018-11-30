@@ -107,7 +107,7 @@ function getPageAndItemKey(scope, key, separator) {
  * @returns
  */
 export function factory(config = {}) {
-    const { ns = '$ns$', strict = false, template = {}, scopeSeparator = '/' } = config;
+    const { ns = '$ns$', strict = false, template = {}, scopeSeparator = '/', getterStrict = true } = config;
     if(strict && !isSimpleObject(template)) {
         throw new Error('when "strict" is true, template is needed. template is a simple object.');
     }
@@ -146,7 +146,9 @@ export function factory(config = {}) {
             const { type = DEFAULT_STORAGE_TYPE, scope = '', defaultValue } = opts;
             checkParams({type});
             const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
-            strictCheck(strict, template, page, itemKey);
+            if (!!getterStrict) {
+                strictCheck(strict, template, page, itemKey);
+            }
             const storeKey = `${partialStoreKey}-${page}`;
             const value =  storage.getItem(type, storeKey, itemKey);
             if (typeof defaultValue === 'function') {
