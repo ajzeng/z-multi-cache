@@ -1,7 +1,7 @@
 > this is a caching tool that uses localStorage, sessionStorage, url in combination to provide more convenient get data from the cache
 
 ### Install
-`npm i zMultiCache --save`
+`npm i z-multi-cache --save`
 
 ### Use
 #### method 1: use default store
