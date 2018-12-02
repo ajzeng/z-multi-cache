@@ -5,10 +5,13 @@ module.exports = function(env, argv) {
     const buildType = argv.buildType;
     const isProd = buildType === 'prod';
     let config = {
-        entry: "./src/index.js",
+        entry: {
+            index: "./src/index.js",
+            store: "./test/store.js"
+        },
         output: {
             path: path.resolve(__dirname, "build"),
-            filename: "index.js",
+            filename: "[name].js",
             library: "zMultiCache",
             libraryTarget: "umd",
             umdNamedDefine: true
