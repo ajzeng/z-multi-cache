@@ -144,7 +144,7 @@ export function factory(config = {}) {
          */
         getItem(key = '', opts = {}) {
             const { type = DEFAULT_STORAGE_TYPE, scope = '' } = opts;
-            const defaultValue = opts.default;
+            let defaultValue = opts.default;
             checkParams({type});
             const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
             if (!!getterStrict) {
