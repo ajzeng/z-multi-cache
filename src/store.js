@@ -1,7 +1,7 @@
 import storage, { storagesMap, storagesList } from '@storages/index';
 const NAMESPACE_PREFIX = '$zMultiCachePrefix$';
 const DEFAULT_PAGE = '$page$';
-const DEFAULT_STORAGE_TYPE = storagesMap.sessionStorage;
+const DEFAULT_STORAGE_TYPE = 'sessionStorage';
 const noop = function() {};
 const storagesListStr = storagesList.join(', ');
 
