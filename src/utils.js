@@ -10,7 +10,7 @@ export function getUrlParam(key) {
     }
 }
 
-export function updateUrlSearchPart(storageParamObj = {}, urlTitle) {
+export function updateUrlSearchPart(storageParamObj = {}, urlTitle, theTime = 0) {
     const { href, search } = window.location;
     const paramObj = getUrlParam();
     if (!Object.keys(paramObj).length) {
@@ -26,5 +26,11 @@ export function updateUrlSearchPart(storageParamObj = {}, urlTitle) {
     }
     const newHref = href.replace(search, newSearch);
     const title = urlTitle === void 0 ? document.title : urlTitle;
-    window.history.replaceState(null, title, newHref);
+    if (theTime === null) {
+        window.history.replaceState(null, title, newHref);
+    } else {
+        setTimeout(() => {
+            window.history.replaceState(null, title, newHref);
+        }, theTime);
+    }
 }

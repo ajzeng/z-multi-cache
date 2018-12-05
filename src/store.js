@@ -188,16 +188,12 @@ export function factory(config = {}) {
             const storeKey = `${partialStoreKey}-${page}`;
             storage.setItem(type, storeKey, itemKey, value, errCallBack);
             // update the search part of url.
-
-            if (updateUrlSearchKeyTime === null) {
-                updateUrlSearchKey &&
-                    updateUrlSearchPart({ [updateUrlSearchKey]: value });
-            } else {
-                setTimeout(() => {
-                    updateUrlSearchKey &&
-                        updateUrlSearchPart({ [updateUrlSearchKey]: value });
-                }, updateUrlSearchKeyTime);
-            }
+            updateUrlSearchKey &&
+                updateUrlSearchPart(
+                    { [updateUrlSearchKey]: value },
+                    "",
+                    updateUrlSearchKeyTime
+                );
         },
         /**
          * get data from storage
@@ -259,16 +255,12 @@ export function factory(config = {}) {
                 returnValue =
                     value === void 0 || value === null ? defaultValue : value;
             }
-
-            if (updateUrlSearchKeyTime === null) {
-                updateUrlSearchKey &&
-                    updateUrlSearchPart({ [updateUrlSearchKey]: returnValue });
-            } else {
-                setTimeout(() => {
-                    updateUrlSearchKey &&
-                        updateUrlSearchPart({ [updateUrlSearchKey]: returnValue });
-                }, updateUrlSearchKeyTime);
-            }
+            updateUrlSearchKey &&
+                updateUrlSearchPart(
+                    { [updateUrlSearchKey]: returnValue },
+                    "",
+                    updateUrlSearchKeyTime
+                );
             return returnValue;
         },
 
@@ -320,13 +312,13 @@ export function factory(config = {}) {
          *  name: ['userName', {scope: 'home', type: 'localStorage' }]
          * }
          */
-        updateUrlSearch(map = {}, title) {
+        updateUrlSearch(map = {}, title, theTime) {
             let storeVal = {};
             Object.keys(map).forEach(item => {
                 const storeCfgArr = map[item];
                 storeVal[item] = this.getItem(storeCfgArr[0], storeCfgArr[1]);
             });
-            updateUrlSearchPart(storeVal, title);
+            updateUrlSearchPart(storeVal, title, theTime);
         },
         updateUrlSearchByValue: updateUrlSearchPart
     };
