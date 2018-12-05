@@ -309,7 +309,8 @@ export function factory(config = {}) {
                 storeVal[item] = this.getItem(storeCfgArr[0], storeCfgArr[1]);
             });
             updateUrlSearchPart(storeVal, title);
-        }
+        },
+        updateUrlSearchByValue: updateUrlSearchPart
     };
     return store;
 }
