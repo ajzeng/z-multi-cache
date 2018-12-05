@@ -324,7 +324,8 @@ export function factory(config = {}) {
             });
             updateUrlSearchPart(storeVal, title, theTime);
         },
-        updateUrlSearchByValue: updateUrlSearchPart
+        updateUrlSearchByValue: updateUrlSearchPart,
+        getUrlParam
     };
     return store;
 }
