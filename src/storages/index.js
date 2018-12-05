@@ -6,21 +6,41 @@ const originStorageMap = {
     memoryStorage: memoryStorage
 };
 
-export const storagesList = Object.keys(originStorageMap);
-const storagesListStr = storagesList.join(', ');
-export const storagesMap = storagesList.reduce((map, item) => {
+export const setItemStoragesList = Object.keys(originStorageMap);
+export const setItemStoragesMap = setItemStoragesList.reduce((map, item) => {
     map[item] = item;
     return map;
 }, {});
+export const setItemStoragesListStr = setItemStoragesList.join(', ');
+export const getItemStoragesList = setItemStoragesList.concat('urlSearch');
+
+export const getItemStoragesMap = getItemStoragesList.reduce((map, item) => {
+    map[item] = item;
+    return map;
+}, {});
+export const getItemStoragesListStr = getItemStoragesList.join(', ');
 
 /**
  * check if the type is exist.
  *
  * @param {*} type
  */
-function checkStorageType(type) {
-    if(!storagesMap[type]) {
-        throw new Error(`type should be one of: ${storagesListStr}, your value is: ${type}`);
+function checkStorageType(type, method = "setItem") {
+    if (method !== 'setItem' && method !== 'getItem') {
+        throw new Error('method need to be one of setItem, getItem');
+    }
+    if (method === "setItem") {
+        if (!setItemStoragesMap[type]) {
+            throw new Error(
+                `[setItem]: type should be one of: ${setItemStoragesListStr}, your value is: ${type}`
+            );
+        }
+    } else {
+        if (!getItemStoragesMap[type]) {
+            throw new Error(
+                `[getItem]: type should be one of: ${getItemStoragesListStr}, your value is: ${type}`
+            );
+        }
     }
 }
 
@@ -32,7 +52,7 @@ function checkStorageType(type) {
  * @returns store item value
  */
 function getStoreByStoreKey(type, storeKey) {
-    checkStorageType(type);
+    checkStorageType(type, 'getItem');
     const val = originStorageMap[type].getItem(storeKey);
     return JSON.parse(val) || {};
 }

@@ -1,5 +1,6 @@
 const path = require("path");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = function(env, argv) {
     const buildType = argv.buildType;
@@ -31,7 +32,15 @@ module.exports = function(env, argv) {
                 }
             ]
         },
-        plugins: [new CleanWebpackPlugin(["build", "prod"])],
+        plugins: [
+            new CleanWebpackPlugin(["build", "prod"]),
+            new HtmlWebpackPlugin({
+                title: 'Test',
+                template: 'template.html',
+                filename: '../html/store.html',
+                bundle: 'store'
+            })
+        ],
         resolve: {
             extensions: [".", ".js"],
             alias: {

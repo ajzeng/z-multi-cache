@@ -1,9 +1,14 @@
-import storage, { storagesMap, storagesList } from '@storages/index';
-const NAMESPACE_PREFIX = '$zMultiCachePrefix$';
-const DEFAULT_PAGE = '$page$';
-const DEFAULT_STORAGE_TYPE = 'sessionStorage';
+import storage, {
+    getItemStoragesMap,
+    setItemStoragesMap,
+    setItemStoragesListStr,
+    getItemStoragesListStr
+} from "@storages/index";
+import { updateUrlSearchPart, getUrlParam } from "./utils";
+const NAMESPACE_PREFIX = "$zMultiCachePrefix$";
+const DEFAULT_PAGE = "$page$";
+const DEFAULT_STORAGE_TYPE = "sessionStorage";
 const noop = function() {};
-const storagesListStr = storagesList.join(', ');
 
 /**
  * get type of the parameter.
@@ -12,7 +17,10 @@ const storagesListStr = storagesList.join(', ');
  * @returns type
  */
 function getType(obj) {
-    return Object.prototype.toString.call(obj).slice(8, -1).toLocaleLowerCase();
+    return Object.prototype.toString
+        .call(obj)
+        .slice(8, -1)
+        .toLocaleLowerCase();
 }
 
 /**
@@ -22,45 +30,72 @@ function getType(obj) {
  * @returns
  */
 function isSimpleObject(obj) {
-    return getType(obj) !== 'object' ? false : true;
+    return getType(obj) !== "object" ? false : true;
 }
 
 function strictCheck(strict, template, page, itemKey) {
     if (!strict) {
-        return; 
+        return;
     }
     if (isGlobalStore(page)) {
         const { globalKeys } = template;
-        if (getType(globalKeys) !== 'array') {
-            throw new Error('globalKeys need to be an array.');
+        if (getType(globalKeys) !== "array") {
+            throw new Error("globalKeys need to be an array.");
         }
-        if (!globalKeys.some((item) => {
-            return item === itemKey;
-        })) {
-            throw new Error(`key "${itemKey}" should be defined in globalKeys firstly.`);
+        if (
+            !globalKeys.some(item => {
+                return item === itemKey;
+            })
+        ) {
+            throw new Error(
+                `key "${itemKey}" should be defined in globalKeys firstly.`
+            );
         }
     } else {
         const { pages } = template;
-        if (getType(pages) !== 'array') {
-            throw new Error('pages need to be an array.');
+        if (getType(pages) !== "array") {
+            throw new Error("pages need to be an array.");
         }
-        if (!pages.some((item) => {
-            return item === page;
-        })) {
-            throw new Error(`the page part of scope "${page}" should be defined in pages firstly.`);
+        if (
+            !pages.some(item => {
+                return item === page;
+            })
+        ) {
+            throw new Error(
+                `the page part of scope "${page}" should be defined in pages firstly.`
+            );
         }
     }
 }
 
-function checkParams({ type }) {
-    if (!storagesMap[type]) {
-        throw new Error(`type should be one of: ${storagesListStr}, your value is: ${type}`);
+function checkParams({ type }, method = "setItem") {
+    if (method !== "setItem" && method !== "getItem") {
+        throw new Error("method need to be one of setItem, getItem");
     }
-    return true;
+    if (method === "setItem") {
+        if (!setItemStoragesMap[type]) {
+            throw new Error(
+                `[setItem]: type should be one of: ${setItemStoragesListStr}, your value is: ${type}`
+            );
+        }
+    } else {
+        if (!getItemStoragesMap[type]) {
+            throw new Error(
+                `[getItem]: type should be one of: ${getItemStoragesListStr}, your value is: ${type}`
+            );
+        }
+    }
+}
+
+function getDefaultValue(defaultVal) {
+    if (typeof defaultVal === "function") {
+        return defaultVal();
+    }
+    return defaultVal;
 }
 
 function isGlobalStore(page) {
-    return page === 'global';
+    return page === "global";
 }
 
 /**
@@ -72,30 +107,32 @@ function isGlobalStore(page) {
  * @returns
  */
 function getPageAndItemKey(scope, key, separator) {
-    if (typeof scope !== 'string') {
-        throw new Error('scope need to be a string.');
+    if (typeof scope !== "string") {
+        throw new Error("scope need to be a string.");
     }
     // scope = scope.replace(/^(\s*)\/?(\s*)|(\s*)\/?(\s*)$/g, '');
-    scope = scope.replace(/\s*\/?\s*$/g, '');
+    scope = scope.replace(/\s*\/?\s*$/g, "");
     const idx = scope.indexOf(separator);
     const hasSeparator = idx !== -1;
     const page = scope.slice(0, hasSeparator ? idx : void 0).trim();
-    let keyPrefix = scope.substr(hasSeparator ? idx + separator.length : scope.length).trim();
+    let keyPrefix = scope
+        .substr(hasSeparator ? idx + separator.length : scope.length)
+        .trim();
     keyPrefix = keyPrefix.length ? `${keyPrefix}>` : `${keyPrefix}`;
     const itemKey = isGlobalStore(page) ? `${key}` : `${keyPrefix}${key}`;
     return {
         page: page || void 0, // 如果page为''则返回void 0，是为了方便后面处理默认值
         itemKey
-    }
+    };
 }
 
 /**
  * provide the ability to create a store with some config.
- * 
+ *
  * @api factory
  * @export
  * @param {*} [config={
- *  ns: '$ns$', // namespace, default "$ns$".you can set a ns in a new project, then the data stored in sessionStorage or localStorage will not cover the data from other projects. 
+ *  ns: '$ns$', // namespace, default "$ns$".you can set a ns in a new project, then the data stored in sessionStorage or localStorage will not cover the data from other projects.
  *  scopeSeparator: '/', // separator in scope string. when you do: store.set({scope:'homePage/flightPart', key:'city', value: 'beijing'}); the key use "/" to distinguish each part.
  *  strict: true, // it represents whether to use strict mode.
  *  template: { // if you use strict mode. when you set or get Data. store will validate data according to the template config.
@@ -107,9 +144,17 @@ function getPageAndItemKey(scope, key, separator) {
  * @returns
  */
 export function factory(config = {}) {
-    const { ns = '$ns$', strict = false, template = {}, scopeSeparator = '/', getterStrict = true } = config;
-    if(strict && !isSimpleObject(template)) {
-        throw new Error('when "strict" is true, template is needed. template is a simple object.');
+    const {
+        ns = "$ns$",
+        strict = false,
+        template = {},
+        scopeSeparator = "/",
+        getterStrict = true
+    } = config;
+    if (strict && !isSimpleObject(template)) {
+        throw new Error(
+            'when "strict" is true, template is needed. template is a simple object.'
+        );
     }
     const partialStoreKey = `${NAMESPACE_PREFIX}-${ns}`;
     const store = {
@@ -121,16 +166,29 @@ export function factory(config = {}) {
          *  scope: 'homePage/flightPart', // if scope is "global", the key will be checked if it is defined in globalKeys. if it is normal scope. for example: 'home/flight', the first part "home"
          *                                 // will be check if it is defined in pages while you set strict to be true.
          *  key: 'city', // store key
-         *  value: 'beijing' // store value
+         *  value: 'beijing', // store value
+         *  updateUrlSearchKey
          * }]
          */
-        setItem(key = '', value, opts = {}) {
-            const { type = DEFAULT_STORAGE_TYPE, scope = '', errCallBack = noop } = opts;
-            checkParams({type});
-            const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
+        setItem(key = "", value, opts = {}) {
+            const {
+                type = DEFAULT_STORAGE_TYPE,
+                scope = "global",
+                errCallBack = noop,
+                updateUrlSearchKey
+            } = opts;
+            checkParams({ type });
+            const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(
+                scope,
+                key,
+                scopeSeparator
+            );
             strictCheck(strict, template, page, itemKey);
             const storeKey = `${partialStoreKey}-${page}`;
             storage.setItem(type, storeKey, itemKey, value, errCallBack);
+            // update the search part of url.
+            updateUrlSearchKey &&
+                updateUrlSearchPart({ [updateUrlSearchKey]: value });
         },
         /**
          * get data from storage
@@ -142,20 +200,57 @@ export function factory(config = {}) {
          * }]
          * @returns
          */
-        getItem(key = '', opts = {}) {
-            const { type = DEFAULT_STORAGE_TYPE, scope = '' } = opts;
+        getItem(key = "", opts = {}) {
+            let {
+                type = DEFAULT_STORAGE_TYPE,
+                scope = "global",
+                updateUrlSearchKey
+            } = opts;
             let defaultValue = opts.default;
-            checkParams({type});
-            const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
-            if (!!getterStrict) {
-                strictCheck(strict, template, page, itemKey);
+            // 当type是一个数组的时候，按照数组顺序为优先级来取数据
+            if (getType(type) === "array") {
+                for (let i = 0, len = type.length; i < len; i++) {
+                    const result = this.getItem(key, {
+                        ...opts,
+                        type: type[i],
+                        default: void 0
+                    });
+                    if (result) {
+                        return result;
+                    } else {
+                        continue;
+                    }
+                }
+                return defaultValue;
             }
-            const storeKey = `${partialStoreKey}-${page}`;
-            const value =  storage.getItem(type, storeKey, itemKey);
-            if (typeof defaultValue === 'function') {
-                defaultValue = defaultValue();
+
+            if (isSimpleObject(type)) {
+                key = type.key || key;
+                type = type.type;
             }
-            const returnValue = (value === void 0 || value === null) ? defaultValue : value;
+
+            checkParams({ type }, "getItem");
+            defaultValue = getDefaultValue(defaultValue);
+            let returnValue;
+            if (type === "urlSearch") {
+                const val = getUrlParam(key);
+                returnValue = val || defaultValue;
+            } else {
+                const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(
+                    scope,
+                    key,
+                    scopeSeparator
+                );
+                if (!!getterStrict) {
+                    strictCheck(strict, template, page, itemKey);
+                }
+                const storeKey = `${partialStoreKey}-${page}`;
+                const value = storage.getItem(type, storeKey, itemKey);
+                returnValue =
+                    value === void 0 || value === null ? defaultValue : value;
+            }
+            updateUrlSearchKey &&
+                updateUrlSearchPart({ [updateUrlSearchKey]: returnValue });
             return returnValue;
         },
 
@@ -166,9 +261,13 @@ export function factory(config = {}) {
          * @param {*} [opts={}]
          */
         removeItem(key, opts = {}) {
-            const { type = DEFAULT_STORAGE_TYPE, scope = '' } = opts;
-            checkParams({type});
-            const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
+            const { type = DEFAULT_STORAGE_TYPE, scope = "global" } = opts;
+            checkParams({ type });
+            const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(
+                scope,
+                key,
+                scopeSeparator
+            );
             strictCheck(strict, template, page, itemKey);
             const storeKey = `${partialStoreKey}-${page}`;
             store.removeItem(type, storeKey, itemKey);
@@ -180,15 +279,37 @@ export function factory(config = {}) {
          * @param {*} [opts={}]
          */
         clear(opts = {}) {
-            const key = '';
-            const { type = DEFAULT_STORAGE_TYPE, scope = '' } = opts;
-            checkParams({type});
-            const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(scope, key, scopeSeparator);
+            const key = "";
+            const { type = DEFAULT_STORAGE_TYPE, scope = "global" } = opts;
+            checkParams({ type });
+            const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(
+                scope,
+                key,
+                scopeSeparator
+            );
             strictCheck(strict, template, page, itemKey);
             const storeKey = `${partialStoreKey}-${page}`;
             store.clear(type, storeKey);
         },
-        types: storagesMap
+        types: getItemStoragesMap,
+        /**
+         * update the param in the url search part.
+         *
+         * @param {*} [map={}]
+         *
+         * map = {
+         *  city: ['hotelCity', { scope: 'global' }], // 'city' is from the search part of url. 'hotelCity' is the key of the date stored in storage.
+         *  name: ['userName', {scope: 'home', type: 'localStorage' }]
+         * }
+         */
+        updateUrlSearch(map = {}, title) {
+            let storeVal = {};
+            Object.keys(map).forEach(item => {
+                const storeCfgArr = map[item];
+                storeVal[item] = this.getItem(storeCfgArr[0], storeCfgArr[1]);
+            });
+            updateUrlSearchPart(storeVal, title);
+        }
     };
     return store;
 }
@@ -196,4 +317,3 @@ export function factory(config = {}) {
 const store = factory();
 
 export default store;
-
