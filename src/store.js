@@ -175,7 +175,8 @@ export function factory(config = {}) {
                 type = DEFAULT_STORAGE_TYPE,
                 scope = "global",
                 errCallBack = noop,
-                updateUrlSearchKey
+                updateUrlSearchKey,
+                updateUrlSearchKeyTime = 0
             } = opts;
             checkParams({ type });
             const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(
@@ -187,8 +188,16 @@ export function factory(config = {}) {
             const storeKey = `${partialStoreKey}-${page}`;
             storage.setItem(type, storeKey, itemKey, value, errCallBack);
             // update the search part of url.
-            updateUrlSearchKey &&
-                updateUrlSearchPart({ [updateUrlSearchKey]: value });
+
+            if (updateUrlSearchKeyTime === null) {
+                updateUrlSearchKey &&
+                    updateUrlSearchPart({ [updateUrlSearchKey]: value });
+            } else {
+                setTimeout(() => {
+                    updateUrlSearchKey &&
+                        updateUrlSearchPart({ [updateUrlSearchKey]: value });
+                }, updateUrlSearchKeyTime);
+            }
         },
         /**
          * get data from storage
@@ -204,7 +213,8 @@ export function factory(config = {}) {
             let {
                 type = DEFAULT_STORAGE_TYPE,
                 scope = "global",
-                updateUrlSearchKey
+                updateUrlSearchKey,
+                updateUrlSearchKeyTime = 0
             } = opts;
             let defaultValue = opts.default;
             // 当type是一个数组的时候，按照数组顺序为优先级来取数据
@@ -249,8 +259,16 @@ export function factory(config = {}) {
                 returnValue =
                     value === void 0 || value === null ? defaultValue : value;
             }
-            updateUrlSearchKey &&
-                updateUrlSearchPart({ [updateUrlSearchKey]: returnValue });
+
+            if (updateUrlSearchKeyTime === null) {
+                updateUrlSearchKey &&
+                    updateUrlSearchPart({ [updateUrlSearchKey]: returnValue });
+            } else {
+                setTimeout(() => {
+                    updateUrlSearchKey &&
+                        updateUrlSearchPart({ [updateUrlSearchKey]: returnValue });
+                }, updateUrlSearchKeyTime);
+            }
             return returnValue;
         },
 
