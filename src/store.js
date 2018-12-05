@@ -316,7 +316,11 @@ export function factory(config = {}) {
             let storeVal = {};
             Object.keys(map).forEach(item => {
                 const storeCfgArr = map[item];
-                storeVal[item] = this.getItem(storeCfgArr[0], storeCfgArr[1]);
+                if (getType(storeCfgArr) === 'array') {
+                    storeVal[item] = this.getItem(storeCfgArr[0], storeCfgArr[1]);
+                } else {
+                    storeVal[item] = storeCfgArr;
+                }
             });
             updateUrlSearchPart(storeVal, title, theTime);
         },
