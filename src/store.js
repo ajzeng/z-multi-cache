@@ -301,6 +301,29 @@ export function factory(config = {}) {
             const storeKey = `${partialStoreKey}-${page}`;
             store.clear(type, storeKey);
         },
+
+        // clear all storage generate from this util.
+        // type can be 'sessionStorage', 'localStorage', or an array.
+        clearAll(type = 'sessionStorage') {
+            const pages = template.pages || [];
+            const allPages = pages.concat('global');
+            if (getType(type) === 'array') {
+                type.forEach((_type) => {
+                    this.clearAll(type);
+                });
+                return;
+            }
+            if (!setItemStoragesMap[type]) {
+                throw new Error(
+                    `type should be one of: ${setItemStoragesListStr}, your value is: ${type}`
+                );
+            }
+            allPages.forEach((page) => {
+                const storeKey = `${partialStoreKey}-${page}`;
+                storage.clear(type, storeKey);
+            });
+        },
+
         types: getItemStoragesMap,
         /**
          * update the param in the url search part.

@@ -16,4 +16,8 @@ store.updateUrlSearch({
 });
 console.log('val:', val);
 
+setTimeout(() => {
+    store.clearAll();
+}, 3000)
+
 
