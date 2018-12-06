@@ -1,6 +1,6 @@
 import memoryStorage from "./memoryStorage";
 
-const originStorageMap = {
+export const originStorageMap = {
     localStorage: localStorage,
     sessionStorage: sessionStorage,
     memoryStorage: memoryStorage
