@@ -177,7 +177,7 @@ export function factory(config = {}) {
                 scope = "global",
                 errCallBack = noop,
                 updateUrlSearchKey,
-                updateUrlSearchKeyTime = 0
+                updateUrlSearchKeyTime
             } = opts;
             checkParams({ type });
             const { page = DEFAULT_PAGE, itemKey } = getPageAndItemKey(
@@ -192,8 +192,8 @@ export function factory(config = {}) {
             updateUrlSearchKey &&
                 updateUrlSearchPart(
                     { [updateUrlSearchKey]: value },
-                    "",
-                    updateUrlSearchKeyTime
+                    updateUrlSearchKeyTime,
+                    ""
                 );
         },
         /**
@@ -211,7 +211,7 @@ export function factory(config = {}) {
                 type = DEFAULT_STORAGE_TYPE,
                 scope = "global",
                 updateUrlSearchKey,
-                updateUrlSearchKeyTime = 0
+                updateUrlSearchKeyTime
             } = opts;
             let defaultValue = opts.default;
             // 当type是一个数组的时候，按照数组顺序为优先级来取数据
@@ -259,8 +259,8 @@ export function factory(config = {}) {
             updateUrlSearchKey &&
                 updateUrlSearchPart(
                     { [updateUrlSearchKey]: returnValue },
-                    "",
-                    updateUrlSearchKeyTime
+                    updateUrlSearchKeyTime,
+                    ""
                 );
             return returnValue;
         },
@@ -345,7 +345,7 @@ export function factory(config = {}) {
          *  name: ['userName', {scope: 'home', type: 'localStorage' }]
          * }
          */
-        updateUrlSearch(map = {}, title, theTime) {
+        updateUrlSearch(map = {}, theTime, title) {
             let storeVal = {};
             Object.keys(map).forEach(item => {
                 const storeCfgArr = map[item];
@@ -355,7 +355,7 @@ export function factory(config = {}) {
                     storeVal[item] = storeCfgArr;
                 }
             });
-            updateUrlSearchPart(storeVal, title, theTime);
+            updateUrlSearchPart(storeVal, theTime, title);
         },
         updateUrlSearchByValue: updateUrlSearchPart,
         getUrlParam

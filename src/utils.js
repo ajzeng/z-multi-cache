@@ -12,13 +12,13 @@ export function getUrlParam(key) {
 
 // 之所以要使用setTimeout是因为我们的小程序中使用了类似日历选择这样的中间页，同时给这个中间页提供了一个url（使用的H5的pushState），
 // 中间页的链接并不是我们想要的，所以默认是用setTimeOut得到中间页关闭后的页面的url，如果要使用同步接口，可以传time为null值即可
-export function updateUrlSearchPart(storageParamObj = {}, urlTitle, theTime = 0) {
-    if (theTime === null) {
-        _updateUrlSearchPart(storageParamObj, urlTitle);
-    } else {
+export function updateUrlSearchPart(storageParamObj = {}, theTime, urlTitle) {
+    if (typeof theTime === 'number') {
         setTimeout(() => {
             _updateUrlSearchPart(storageParamObj, urlTitle);
         }, theTime);
+    } else {
+        _updateUrlSearchPart(storageParamObj, urlTitle);
     }
 }
 
