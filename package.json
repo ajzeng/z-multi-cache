@@ -1,6 +1,6 @@
 {
     "name": "z-multi-cache",
-    "version": "0.0.17",
+    "version": "0.0.18",
     "description": "this is a caching tool that uses localStorage, sessionStorage, memory storage in combination to provide more convenient get data from the cache",
     "main": "lib/index.js",
     "scripts": {
@@ -17,6 +17,7 @@
         "localStorage",
         "sessionStorage",
         "memoryStorage",
+        "url",
         "storage"
     ],
     "author": "anjun.zeng",

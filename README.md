@@ -93,6 +93,13 @@
     // getItem, in localStorage, get value from key: 'defaultKey', in sessionStorage get value from key: 'ssKey'
     store.getItem('defaultKey', {scope: 'global', type: ['localStorage', {type: 'sessionStorage', key: 'ssKey' }] })
 
+    // getItem according to the priorities of "localStorage", "sessionStorage", and "urlSearch". the default value is "2018-12-12" while the result of getItem is undefined. if getItem from urlSearch, the key is arrDate
+    store.getItem('theDate', {
+        scope: 'global',
+        type: ['localStorage', 'sessionStorage', { type: 'urlSearch', key: 'arrDate'}],
+        default: function() {  return '2018-12-12' } // default can also be a string: '2018-12-12'
+    });
+
     // update search part of the url
     // if 'theCityName' in the search part of url, then the value from storage of key: cityName will update 'theCityName'
     store.getItem('cityName', {scope: 'global', updateSearchUrlKey: 'theCityName' })
@@ -104,4 +111,28 @@
         arrDateKeyOfSearch: ['arrDate', {scope: 'global', type: ['sessionStorage', 'localStorage'] }] // first get value from sessionStorage
     });
 
+    // updateUrlSearch asynchronously, the search part of the url will be updated after 100ms.
+    store.updateUrlSearch({
+        data: "2018-12-12",
+        arrDateKeyOfSearch: ['arrDate', {scope: 'global', type: ['sessionStorage', 'localStorage'] }] // first get value from sessionStorage
+    }, 100);
+
+    // updateUrlSearch when setItem or getItem
+    store.setItem('cityName', { updateSearchUrlKey: 'city', updateSearchUrlKeyTime: 400 }); // update url after 400ms, the default scope is "global" and default type is "sessionStorage"
+
+    store.getItem('arrDate', { updateSearchUrlKey: 'arrDate', updateSearchUrlKeyTime: 500 }); // update url after 500ms
+
+    // url utils
+
+    const { getUrlParam, updateUrlSearch } = store;
+    const urlParamObj = getUrlParam();
+    const cityName = getUrlParam('cityName');
+    
+    const _setTimeout = 500;
+    updateUrlSearch({
+        cityName: 'beijing',
+        arrDate: '2018-12-12'
+    }, _setTimeout); // if _setTimeout is undefined, the updateUrlSearch will be invoked synchronously.
+
+    
 ```
