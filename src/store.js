@@ -214,6 +214,7 @@ export function factory(config = {}) {
                 updateUrlSearchKeyTime
             } = opts;
             let defaultValue = opts.default;
+            defaultValue = getDefaultValue(defaultValue);
             // 当type是一个数组的时候，按照数组顺序为优先级来取数据
             if (getType(type) === "array") {
                 for (let i = 0, len = type.length; i < len; i++) {
@@ -237,7 +238,6 @@ export function factory(config = {}) {
             }
 
             checkParams({ type }, "getItem");
-            defaultValue = getDefaultValue(defaultValue);
             let returnValue;
             if (type === "urlSearch") {
                 const val = getUrlParam(key);
