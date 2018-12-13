@@ -281,7 +281,7 @@ export function factory(config = {}) {
             );
             strictCheck(strict, template, page, itemKey);
             const storeKey = `${partialStoreKey}-${page}`;
-            store.removeItem(type, storeKey, itemKey);
+            storage.removeItem(type, storeKey, itemKey);
         },
 
         /**
@@ -300,7 +300,7 @@ export function factory(config = {}) {
             );
             strictCheck(strict, template, page, itemKey);
             const storeKey = `${partialStoreKey}-${page}`;
-            store.clear(type, storeKey);
+            storage.clear(type, storeKey);
         },
 
         // clear all storage generate from this util.
